@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block title %}文件解密 - 文件加密解密系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-unlock"></i> 文件解密</h2>
+        <p class="text-muted">上传加密文件和对应的密码本进行解密</p>
+    </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" id="decryptForm">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="fas fa-file-archive"></i> 加密文件</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="encrypted_files" class="form-label fw-bold">选择加密文件</label>
+                        <input class="form-control" type="file" id="encrypted_files" name="encrypted_files" multiple required>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> 选择需要解密的加密文件，支持多文件同时上传
+                        </div>
+                    </div>
+
+                    <!-- 文件列表预览 -->
+                    <div id="encryptedFilesList" class="mt-3" style="display: none;">
+                        <h6 class="fw-bold">已选择的加密文件:</h6>
+                        <div class="file-list border rounded p-2 bg-light" style="max-height: 200px; overflow-y: auto;">
+                            <ul id="encryptedFilesItems" class="list-unstyled mb-0"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-book"></i> 密码本</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="password_books" class="form-label fw-bold">选择密码本文件</label>
+                        <input class="form-control" type="file" id="password_books" name="password_books" multiple required accept=".json">
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> 选择对应的密码本文件（JSON格式），支持多文件同时上传
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="decrypt_password" class="form-label fw-bold">密码本解密密码</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-key"></i>
+                            </span>
+                            <input type="password" class="form-control" id="decrypt_password" name="decrypt_password" placeholder="如果密码本已加密，请输入密码">
+                        </div>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> 如果密码本未加密，此项可留空
+                        </div>
+                    </div>
+
+                    <!-- 密码本列表预览 -->
+                    <div id="passwordBooksList" class="mt-3" style="display: none;">
+                        <h6 class="fw-bold">已选择的密码本:</h6>
+                        <div class="file-list border rounded p-2 bg-light" style="max-height: 200px; overflow-y: auto;">
+                            <ul id="passwordBooksItems" class="list-unstyled mb-0"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件匹配指南 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-lightbulb"></i> 文件匹配指南</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong><i class="fas fa-exclamation-triangle"></i> 重要提示：</strong>
+                        系统会自动根据文件名匹配加密文件和密码本。为确保匹配成功，请遵循以下命名规则：
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-check text-success"></i> 推荐的命名方式：</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>加密文件</th>
+                                            <th>密码本</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>document.pdf.encrypted</code></td>
+                                            <td><code>password_book_document.pdf.json</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>image.jpg.enc</code></td>
+                                            <td><code>pb_image.jpg.json</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>20241102_document.zip</code></td>
+                                            <td><code>20241102_password_book.json</code></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-times text-danger"></i> 避免的命名方式：</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-ban text-danger me-2"></i>完全不相关的文件名</li>
+                                <li><i class="fas fa-ban text-danger me-2"></i>使用随机字符命名</li>
+                                <li><i class="fas fa-ban text-danger me-2"></i>没有明显关联的文件名</li>
+                            </ul>
+
+                            <h6><i class="fas fa-cogs text-warning"></i> 匹配规则：</h6>
+                            <ul class="list-unstyled small">
+                                <li><i class="fas fa-arrow-right text-primary me-2"></i>文件名包含关系匹配</li>
+                                <li><i class="fas fa-arrow-right text-primary me-2"></i>基础名称相似度匹配</li>
+                                <li><i class="fas fa-arrow-right text-primary me-2"></i>单文件时自动使用唯一密码本</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 解密过程说明 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5><i class="fas fa-cogs"></i> 解密过程说明</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                <i class="fas fa-1 fa-lg"></i>
+                            </div>
+                            <h6>文件匹配</h6>
+                            <p class="small text-muted">自动匹配加密文件和对应的密码本</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                <i class="fas fa-2 fa-lg"></i>
+                            </div>
+                            <h6>密码本验证</h6>
+                            <p class="small text-muted">验证密码本格式并解密（如需要）</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                <i class="fas fa-3 fa-lg"></i>
+                            </div>
+                            <h6>反向操作</h6>
+                            <p class="small text-muted">按照密码本记录反向执行解密操作</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                <i class="fas fa-4 fa-lg"></i>
+                            </div>
+                            <h6>完整性验证</h6>
+                            <p class="small text-muted">验证解密后文件的完整性和正确性</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary me-md-2">
+                    <i class="fas fa-arrow-left me-1"></i>返回首页
+                </a>
+                <button type="submit" class="btn btn-success btn-lg" id="decryptBtn">
+                    <i class="fas fa-unlock me-1"></i>开始解密
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- 使用提示 -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>使用技巧
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>保持加密文件和密码本的文件名关联</li>
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>批量解密时按顺序上传文件</li>
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>记住密码本加密密码（如设置）</li>
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>及时下载解密后的文件</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-exclamation-circle me-2"></i>常见问题
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><i class="fas fa-question text-warning me-2"></i>文件不匹配？检查文件名关联</li>
+                    <li class="mb-2"><i class="fas fa-question text-warning me-2"></i>解密失败？验证密码本完整性</li>
+                    <li class="mb-2"><i class="fas fa-question text-warning me-2"></i>密码错误？确认密码本加密密码</li>
+                    <li class="mb-2"><i class="fas fa-question text-warning me-2"></i>文件损坏？重新获取加密文件</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const decryptForm = document.getElementById('decryptForm');
+    const encryptedFilesInput = document.getElementById('encrypted_files');
+    const passwordBooksInput = document.getElementById('password_books');
+    const decryptBtn = document.getElementById('decryptBtn');
+
+    // 文件选择预览功能
+    function initializeFilePreview(inputElement, listElement, itemsElement) {
+        inputElement.addEventListener('change', function() {
+            const files = this.files;
+            itemsElement.innerHTML = '';
+
+            if (files.length > 0) {
+                listElement.style.display = 'block';
+
+                for (let file of files) {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'py-2 border-bottom';
+                    listItem.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-truncate" style="max-width: 70%;">
+                                <i class="fas fa-file me-2 text-muted"></i>${file.name}
+                            </span>
+                            <small class="text-muted">${formatFileSize(file.size)}</small>
+                        </div>
+                    `;
+                    itemsElement.appendChild(listItem);
+                }
+            } else {
+                listElement.style.display = 'none';
+            }
+        });
+    }
+
+    // 初始化文件预览
+    initializeFilePreview(
+        encryptedFilesInput,
+        document.getElementById('encryptedFilesList'),
+        document.getElementById('encryptedFilesItems')
+    );
+
+    initializeFilePreview(
+        passwordBooksInput,
+        document.getElementById('passwordBooksList'),
+        document.getElementById('passwordBooksItems')
+    );
+
+    // 文件大小格式化函数
+    function formatFileSize(bytes) {
+        if (bytes == 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // 表单提交验证
+    decryptForm.addEventListener('submit', function(e) {
+        const encryptedFiles = encryptedFilesInput.files;
+        const passwordBooks = passwordBooksInput.files;
+
+        // 基本验证
+        if (encryptedFiles.length === 0) {
+            e.preventDefault();
+            alert('请选择至少一个加密文件');
+            encryptedFilesInput.focus();
+            return;
+        }
+
+        if (passwordBooks.length === 0) {
+            e.preventDefault();
+            alert('请选择至少一个密码本文件');
+            passwordBooksInput.focus();
+            return;
+        }
+
+        // 文件数量匹配提示
+        if (encryptedFiles.length !== passwordBooks.length) {
+            const confirmMsg = `加密文件数量 (${encryptedFiles.length}) 与密码本数量 (${passwordBooks.length}) 不匹配。系统将尝试自动匹配，是否继续？`;
+            if (!confirm(confirmMsg)) {
+                e.preventDefault();
+                return;
+            }
+        }
+
+        // 显示加载状态
+        decryptBtn.disabled = true;
+        decryptBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>解密中...';
+    });
+
+    // 密码本文件类型验证
+    passwordBooksInput.addEventListener('change', function() {
+        const files = this.files;
+        for (let file of files) {
+            if (!file.name.toLowerCase().endsWith('.json')) {
+                alert('警告：检测到非JSON格式的密码本文件。请确保选择正确的密码本文件。');
+                break;
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

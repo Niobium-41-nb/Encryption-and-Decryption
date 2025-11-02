@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "encryption_time": "2025-11-02T16:30:19.094990",
+    "total_rounds": 3,
+    "original_filename": "3b68d4357842c6b10d7e7b0350be1831.jpg",
+    "original_hash": "3b68d4357842c6b10d7e7b0350be1831",
+    "final_filename": "20251102_163019_844e3a9f_3b68d4357842c6b10d7e7b0350be1831.tar.tar",
+    "final_hash": "6428bc970efd34879fe7ecd71cbb39da",
+    "book_id": "d9ea6de1537c2a8a3a60b71249430c56"
+  },
+  "rounds": {
+    "1": {
+      "extension": ".txt",
+      "algorithm": "tar",
+      "compressed_filename": "20251102_163019_844e3a9f_3b68d4357842c6b10d7e7b0350be1831.tar",
+      "encrypted_filename": "20251102_163019_844e3a9f_3b68d4357842c6b10d7e7b0350be1831.txt"
+    },
+    "2": {
+      "extension": ".pdf",
+      "algorithm": "tar",
+      "compressed_filename": "20251102_163019_844e3a9f_3b68d4357842c6b10d7e7b0350be1831.tar",
+      "encrypted_filename": "20251102_163019_844e3a9f_3b68d4357842c6b10d7e7b0350be1831.pdf"
+    },
+    "3": {
+      "extension": ".tar",
+      "algorithm": "tar.bz2",
+      "compressed_filename": "20251102_163019_844e3a9f_3b68d4357842c6b10d7e7b0350be1831.tar.bz2",
+      "encrypted_filename": "20251102_163019_844e3a9f_3b68d4357842c6b10d7e7b0350be1831.tar.tar"
+    }
+  },
+  "version": "1.0",
+  "generator": "Flask File Encryption System"
+}

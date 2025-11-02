@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "encryption_time": "2025-11-02T16:39:49.294162",
+    "total_rounds": 3,
+    "original_filename": "2B23605AB854CA64D3D2F34F7655554E (1).png",
+    "original_hash": "7d0b15cd1c106d266019c58f84fc5779",
+    "final_filename": "20251102_163949_c65b0b95_2B23605AB854CA64D3D2F34F7655554E (1).docx",
+    "final_hash": "bb6bcce2d9e21c1a49747225ce0c4bec",
+    "book_id": "e60ac9e95453c0825f5d8aff588ac9fb"
+  },
+  "rounds": {
+    "1": {
+      "extension": ".zip",
+      "algorithm": "gzip",
+      "compressed_filename": "20251102_163949_c65b0b95_2B23605AB854CA64D3D2F34F7655554E (1).gz",
+      "encrypted_filename": "20251102_163949_c65b0b95_2B23605AB854CA64D3D2F34F7655554E (1).zip"
+    },
+    "2": {
+      "extension": ".pdf",
+      "algorithm": "gzip",
+      "compressed_filename": "20251102_163949_c65b0b95_2B23605AB854CA64D3D2F34F7655554E (1).gz",
+      "encrypted_filename": "20251102_163949_c65b0b95_2B23605AB854CA64D3D2F34F7655554E (1).pdf"
+    },
+    "3": {
+      "extension": ".docx",
+      "algorithm": "tar",
+      "compressed_filename": "20251102_163949_c65b0b95_2B23605AB854CA64D3D2F34F7655554E (1).tar",
+      "encrypted_filename": "20251102_163949_c65b0b95_2B23605AB854CA64D3D2F34F7655554E (1).docx"
+    }
+  },
+  "version": "1.0",
+  "generator": "Flask File Encryption System"
+}

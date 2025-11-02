@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}文件加密 - 文件加密解密系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-lock"></i> 文件加密</h2>
+        <p class="text-muted">上传文件并配置加密参数</p>
+    </div>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-upload"></i> 文件上传</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="files" class="form-label">选择文件（可多选）</label>
+                        <input class="form-control" type="file" id="files" name="files" multiple required>
+                        <div class="form-text">支持的文件类型: txt, pdf, png, jpg, zip, docx, xlsx, mp3, mp4 等</div>
+                    </div>
+
+                    {% if files %}
+                    <div class="mb-3">
+                        <h6>已上传的文件:</h6>
+                        {% for file in files %}
+                        <div class="file-info">
+                            <i class="fas fa-file"></i> {{ file.original_name }} 
+                            <span class="badge bg-secondary">{{ file.size|filesizeformat }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-cog"></i> 加密配置</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">加密轮数设置</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="rounds_method" id="manual_rounds" value="manual" checked>
+                            <label class="form-check-label" for="manual_rounds">
+                                手动设置轮数
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="rounds_method" id="specific_code" value="specific_code">
+                            <label class="form-check-label" for="specific_code">
+                                使用特定代码生成轮数
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="manual_rounds_group">
+                        <label for="manual_rounds" class="form-label">加密轮数 (1-10)</label>
+                        <input type="number" class="form-control" id="manual_rounds" name="manual_rounds" value="3" min="1" max="10">
+                    </div>
+
+                    <div class="mb-3" id="specific_code_group" style="display: none;">
+                        <label for="specific_code" class="form-label">特定代码</label>
+                        <input type="text" class="form-control" id="specific_code" name="specific_code" placeholder="输入任意文本生成轮数">
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="encrypt_password_book" name="encrypt_password_book">
+                            <label class="form-check-label" for="encrypt_password_book">
+                                加密密码本
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="password_group" style="display: none;">
+                        <label for="password" class="form-label">密码本密码</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="输入密码本加密密码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-lock"></i> 开始加密
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 加密轮数设置切换
+    const manualRoundsRadio = document.getElementById('manual_rounds');
+    const specificCodeRadio = document.getElementById('specific_code');
+    const manualRoundsGroup = document.getElementById('manual_rounds_group');
+    const specificCodeGroup = document.getElementById('specific_code_group');
+
+    function toggleRoundsGroups() {
+        if (specificCodeRadio.checked) {
+            manualRoundsGroup.style.display = 'none';
+            specificCodeGroup.style.display = 'block';
+        } else {
+            manualRoundsGroup.style.display = 'block';
+            specificCodeGroup.style.display = 'none';
+        }
+    }
+
+    manualRoundsRadio.addEventListener('change', toggleRoundsGroups);
+    specificCodeRadio.addEventListener('change', toggleRoundsGroups);
+
+    // 密码本加密切换
+    const encryptPasswordBook = document.getElementById('encrypt_password_book');
+    const passwordGroup = document.getElementById('password_group');
+
+    encryptPasswordBook.addEventListener('change', function() {
+        passwordGroup.style.display = this.checked ? 'block' : 'none';
+    });
+});
+</script>
+{% endblock %}

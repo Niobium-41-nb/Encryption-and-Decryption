@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "encryption_time": "2025-11-02T15:54:50.108997",
+    "total_rounds": 3,
+    "original_filename": "2B23605AB854CA64D3D2F34F7655554E.png",
+    "original_hash": "52385a14deeb349103db2b647283868d",
+    "final_filename": "20251102_155450_29197b11_2B23605AB854CA64D3D2F34F7655554E.tar.xlsx",
+    "final_hash": "43d26a37da2f21d3ec2f6a5852cc0f4e",
+    "book_id": "976e0222e0f956c4ffd2f2daa4123c86"
+  },
+  "rounds": {
+    "1": {
+      "extension": ".jpg",
+      "algorithm": "zip",
+      "compressed_filename": "20251102_155450_29197b11_2B23605AB854CA64D3D2F34F7655554E.zip",
+      "encrypted_filename": "20251102_155450_29197b11_2B23605AB854CA64D3D2F34F7655554E.jpg"
+    },
+    "2": {
+      "extension": ".gz",
+      "algorithm": "tar",
+      "compressed_filename": "20251102_155450_29197b11_2B23605AB854CA64D3D2F34F7655554E.tar",
+      "encrypted_filename": "20251102_155450_29197b11_2B23605AB854CA64D3D2F34F7655554E.gz"
+    },
+    "3": {
+      "extension": ".xlsx",
+      "algorithm": "tar.gz",
+      "compressed_filename": "20251102_155450_29197b11_2B23605AB854CA64D3D2F34F7655554E.tar.gz",
+      "encrypted_filename": "20251102_155450_29197b11_2B23605AB854CA64D3D2F34F7655554E.tar.xlsx"
+    }
+  },
+  "version": "1.0",
+  "generator": "Flask File Encryption System"
+}

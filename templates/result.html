@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}操作结果 - 文件加密解密系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>
+            <i class="fas fa-{{ 'lock' if operation == 'encrypt' else 'unlock' }}"></i>
+            {{ '加密' if operation == 'encrypt' else '解密' }}结果
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>处理结果</h5>
+            </div>
+            <div class="card-body">
+                {% for result in results %}
+                <div class="mb-4 p-3 border rounded">
+                    {% if operation == 'encrypt' %}
+                        <h6>原文件: {{ result.original_file }}</h6>
+                        {% if result.success %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i> 加密成功
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>加密文件:</strong> {{ result.encrypted_file }}</p>
+                                    <p><strong>加密轮数:</strong> {{ result.rounds }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>密码本:</strong> {{ result.password_book }}</p>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('download_file', file_type='encrypted', filename=result.encrypted_file) }}" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="fas fa-download"></i> 下载加密文件
+                                        </a>
+                                        <a href="{{ url_for('download_file', file_type='password_book', filename=result.password_book) }}" 
+                                           class="btn btn-info btn-sm">
+                                            <i class="fas fa-book"></i> 下载密码本
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle"></i> 加密失败: {{ result.error }}
+                            </div>
+                        {% endif %}
+                    
+                    {% else %}
+                        <h6>加密文件: {{ result.encrypted_file }}</h6>
+                        {% if result.success %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i> 解密成功
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>原文件名:</strong> {{ result.original_filename }}</p>
+                                    <p><strong>解密文件:</strong> {{ result.decrypted_file }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{{ url_for('download_file', file_type='decrypted', filename=result.decrypted_file) }}" 
+                                       class="btn btn-success btn-sm">
+                                        <i class="fas fa-download"></i> 下载解密文件
+                                    </a>
+                                    <button type="button" class="btn btn-outline-info btn-sm copy-link-btn"
+                                            data-url="{{ url_for('download_file', file_type='decrypted', filename=result.decrypted_file, _external=True) }}">
+                                        <i class="fas fa-copy"></i> 复制链接
+                                    </button>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle"></i> 解密失败: {{ result.error }}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12 text-center">
+        <div class="btn-group">
+            <a href="{{ url_for('encrypt_config') if operation == 'encrypt' else url_for('decrypt_config') }}" 
+               class="btn btn-primary">
+                <i class="fas fa-{{ 'lock' if operation == 'encrypt' else 'unlock' }}"></i>
+                继续{{ '加密' if operation == 'encrypt' else '解密' }}
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 下载统计 -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>下载说明：</strong>
+            <ul class="mb-0">
+                <li>如果下载失败，请检查浏览器是否阻止了弹出窗口</li>
+                <li>大文件下载可能需要一些时间</li>
+                <li>解密文件会自动保存到方便下载的位置</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('下载链接已复制到剪贴板');
+    }).catch(err => {
+        console.error('复制失败:', err);
+        alert('复制失败，请手动复制链接');
+    });
+}
+
+// 添加下载统计和复制链接功能
+document.addEventListener('DOMContentLoaded', function() {
+    const downloadLinks = document.querySelectorAll('a[href*="/download/"]');
+    
+    downloadLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            const filename = this.href.split('/').pop();
+            console.log('开始下载文件:', filename);
+        });
+    });
+
+    // 处理复制链接按钮点击事件
+    const copyButtons = document.querySelectorAll('.copy-link-btn');
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            copyToClipboard(url);
+        });
+    });
+});
+</script>
+{% endblock %}

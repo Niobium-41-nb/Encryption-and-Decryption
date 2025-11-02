@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 文件加密解密系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-5">
+        <h1 class="display-4">文件加密解密系统</h1>
+        <p class="lead">安全、高效的多轮文件加密解决方案</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+                <h3 class="card-title">文件加密</h3>
+                <p class="card-text">使用多轮压缩和重命名技术对文件进行加密保护</p>
+                <a href="{{ url_for('encrypt_config') }}" class="btn btn-primary">开始加密</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-unlock fa-3x text-success mb-3"></i>
+                <h3 class="card-title">文件解密</h3>
+                <p class="card-text">使用密码本对加密文件进行反向解密操作</p>
+                <a href="{{ url_for('decrypt_config') }}" class="btn btn-success">开始解密</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-book fa-3x text-info mb-3"></i>
+                <h3 class="card-title">密码本管理</h3>
+                <p class="card-text">查看、管理和删除密码本文件</p>
+                <a href="{{ url_for('password_books') }}" class="btn btn-info">管理密码本</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-info-circle"></i> 系统特性</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>加密特性</h5>
+                        <ul>
+                            <li>多轮压缩加密（1-10轮可配置）</li>
+                            <li>随机后缀名伪装</li>
+                            <li>支持多种压缩算法</li>
+                            <li>密码本加密保护</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>安全特性</h5>
+                        <ul>
+                            <li>文件完整性验证</li>
+                            <li>自动清理临时文件</li>
+                            <li>安全的密码本存储</li>
+                            <li>支持大文件处理（最大500MB）</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
