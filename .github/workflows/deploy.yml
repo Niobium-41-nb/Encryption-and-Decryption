@@ -1,0 +1,165 @@
+name: Deploy Flask Encryption App
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run basic tests
+      run: |
+        python -c "
+        import sys
+        sys.path.append('.')
+        from app import app
+        print('Flask app imported successfully')
+        
+        # Test config import
+        from config import Config
+        print('Config imported successfully')
+        
+        # Test utils imports
+        from utils.encryption_engine import EncryptionEngine
+        from utils.file_processor import FileProcessor
+        from utils.password_book import PasswordBookManager
+        print('All utils imported successfully')
+        "
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install gunicorn
+    
+    - name: Create deployment package
+      run: |
+        # 创建必要的目录
+        mkdir -p static/uploads static/password_books
+        
+        # 创建启动脚本
+        cat > start.sh << 'EOF'
+        #!/bin/bash
+        export SECRET_KEY=$SECRET_KEY
+        gunicorn --bind 0.0.0.0:$PORT app:app
+        EOF
+        chmod +x start.sh
+        
+        # 创建 requirements.txt 用于部署
+        cat > requirements-deploy.txt << 'EOF'
+        Flask==2.3.3
+        Werkzeug==2.3.7
+        cryptography==41.0.4
+        gunicorn==21.2.0
+        EOF
+        
+        # 创建 Procfile (用于 Heroku 等平台)
+        echo "web: gunicorn --bind 0.0.0.0:\$PORT app:app" > Procfile
+        
+        # 创建 runtime.txt
+        echo "python-3.11.0" > runtime.txt
+
+    - name: Create deployment documentation
+      run: |
+        cat > DEPLOYMENT.md << 'EOF'
+        # 部署说明
+        
+        ## 环境变量
+        - `SECRET_KEY`: Flask应用密钥
+        - `PORT`: 服务端口（通常由平台自动设置）
+        
+        ## 部署到不同平台
+        
+        ### Heroku
+        1. 安装 Heroku CLI
+        2. 登录: `heroku login`
+        3. 创建应用: `heroku create your-app-name`
+        4. 设置密钥: `heroku config:set SECRET_KEY=your-secret-key`
+        5. 部署: `git push heroku main`
+        
+        ### Railway
+        1. 连接 GitHub 仓库
+        2. 设置环境变量
+        3. 自动部署
+        
+        ### PythonAnywhere
+        1. 上传文件
+        2. 配置虚拟环境
+        3. 设置 WSGI 配置
+        
+        ### Vercel (需要适配)
+        可能需要修改为 serverless 架构
+        
+        ## 本地运行
+        ```bash
+        export SECRET_KEY=your-secret-key
+        python app.py
+        ```
+        EOF
+
+    - name: Upload deployment artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: flask-encryption-app
+        path: |
+          .
+          !.git
+        retention-days: 30
+
+  deploy-to-heroku:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Deploy to Heroku
+      uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+        heroku_email: ${{secrets.HEROKU_EMAIL}}
+        usedocker: false
