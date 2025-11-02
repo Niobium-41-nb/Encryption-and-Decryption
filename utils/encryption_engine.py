@@ -181,9 +181,9 @@ class EncryptionEngine:
             if not os.path.exists(current_file):
                 raise Exception(f"解密完成后文件不存在: {current_file}")
 
-            # 如果最终文件在 _extracted 目录中，将其移动到上传目录
+            # 如果最终文件在 extracted 目录中，将其移动到上传目录
             final_filename = os.path.basename(current_file)
-            if '_extracted' in current_file:
+            if 'extracted_' in current_file:
                 # 创建目标路径
                 target_path = os.path.join(Config.UPLOAD_FOLDER, final_filename)
                 

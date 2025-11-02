@@ -105,8 +105,10 @@ class FileProcessor:
             import time
             base_name = os.path.splitext(file_path)[0]
             timestamp = str(int(time.time() * 1000))
-            extract_dir = f"{base_name}_extracted_{timestamp}"
-
+            
+            # 使用更短的目录名，避免Windows路径过长问题
+            extract_dir = os.path.join(self.upload_folder, f"extracted_{timestamp}")
+            
             # 确保目录不存在，避免冲突
             if os.path.exists(extract_dir):
                 shutil.rmtree(extract_dir)
@@ -138,7 +140,7 @@ class FileProcessor:
 
             elif algorithm == 'gzip':
                 # 对于gzip，解压后是单个文件
-                output_path = base_name  # 移除.gz扩展名
+                output_path = os.path.join(extract_dir, os.path.basename(base_name))
                 with gzip.open(file_path, 'rb') as f_in:
                     with open(output_path, 'wb') as f_out:
                         shutil.copyfileobj(f_in, f_out)
